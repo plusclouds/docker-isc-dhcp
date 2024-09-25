@@ -1,0 +1,22 @@
+name: Build application and store it on the deployment service
+on:
+  push:
+    tags:
+      - 'v*'
+      - 'v*-staging'
+      - 'v*-stable'
+
+jobs:
+  package:
+    runs-on: self-hosted
+    steps:
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+        with:
+          # Optionally strip `v` prefix
+          strip_v: true
+      - name: Pack the application
+        run: sudo docker build -t 10.128.0.100/leo4-dhcp:${{steps.tag.outputs.tag}} -t 10.128.0.100/leo4-dhcp:latest -t 10.128.0.100/leo4-dhcp .
+      - name: Pushing to registry
+        run: docker image push --all-tags 10.128.0.100/leo4-dhcp
