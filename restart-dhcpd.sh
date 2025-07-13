@@ -3,11 +3,11 @@
 touch dhcpd.leases
 
 # We are doing this because openresty, while running LUA, cannot read the environment variables.
-source openresty.env
+source /root/openresty.env
 
-curl {$API}/iaas/configurations/dhcp-servers/{$SERVER_ID} \
-  -H "Authorization: Bearer {$ACCESS_TOKEN}" \
-  -o dhcpd.conf
+curl {$API}/public/iaas/dhcp-servers/configuration/{$SERVER_ID} \
+  -H "Authorization: {$ACCESS_TOKEN}" \
+  -o /etc/dhcp/dhcpd.conf
 
 rm /etc/default/isc-dhcp-server
 
@@ -16,4 +16,4 @@ echo "INTERFACESv4=\"$INTERFACE\"" > /etc/default/isc-dhcp-server
 pkill dhcpd
 
 # Restart the dhcpd service
-dhcpd -cf dhcpd.conf -lf dhcpd.leases --no-pid -4 -f
+service isc-dhcp-server restart
